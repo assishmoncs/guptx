@@ -72,20 +72,6 @@ GuptX uses Groq's fast LLM inference for responsive conversations.
 
 ---
 
-## 📁 Project Structure
-
-```
-guptx/
-├── manifest.json
-├── background/
-├── content/
-├── api/
-├── utils/
-└── assets/
-```
-
----
-
 ## 🎯 Project Goal
 
 GuptX explores the idea of an **AI layer integrated directly into browsing**, providing fast assistance without opening new tabs or interrupting workflow.
@@ -95,9 +81,3 @@ GuptX explores the idea of an **AI layer integrated directly into browsing**, pr
 ## ⚠️ Disclaimer
 
 This project is intended for learning and productivity purposes only.
-
----
-
-## 📜 License
-
-MIT License
