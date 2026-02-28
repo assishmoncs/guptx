@@ -1,25 +1,8 @@
-// api/llm.js
-// LLM API Layer — provider-agnostic.
-// To switch providers: update PROVIDER config and implement the corresponding
-// buildRequest / parseResponse pair below.
-//
-// Supported out of the box:
-//   "groq"        — https://console.groq.com
-//   "openrouter"  — https://openrouter.ai
-//   "openai"      — https://platform.openai.com
-//
-// HOW TO ACTIVATE:
-//   1. Obtain an API key from your chosen provider.
-//   2. Set PROVIDER.name and PROVIDER.apiKey below.
-//   3. Reload the extension.
-
 const PROVIDER = {
-  name:   "groq",                      // "groq" | "openrouter" | "openai"
-  apiKey: "YOUR_API_KEY_HERE",         // ← Replace with your real key
-  model:  "llama-3.1-8b-instant",            // Groq default; change per provider
+  name:   "groq",                      
+  apiKey: "YOUR_API_KEY_HERE",         
+  model:  "llama-3.1-8b-instant",            
 };
-
-// ── Provider definitions ─────────────────────────────────────────────────────
 
 const PROVIDERS = {
   groq: {
@@ -78,8 +61,6 @@ const PROVIDERS = {
   },
 };
 
-// ── System prompt ────────────────────────────────────────────────────────────
-
 const SYSTEM_PROMPT = {
   role: "system",
   content:
@@ -88,14 +69,6 @@ const SYSTEM_PROMPT = {
     "Be helpful, direct, and professional.",
 };
 
-// ── Main export ──────────────────────────────────────────────────────────────
-
-/**
- * sendMessage — sends a conversation to the configured LLM and returns the reply.
- *
- * @param {Array<{role: string, content: string}>} messages  Chat history
- * @returns {Promise<string>}  The assistant's reply text
- */
 async function sendMessage(messages) {
   if (PROVIDER.apiKey === "YOUR_API_KEY_HERE" || !PROVIDER.apiKey) {
     throw new Error(
@@ -108,7 +81,7 @@ async function sendMessage(messages) {
     throw new Error(`Unknown provider: "${PROVIDER.name}"`);
   }
 
-  // Prepend system prompt; ensure it appears only once
+  
   const fullMessages = [
     SYSTEM_PROMPT,
     ...messages.filter((m) => m.role !== "system"),
@@ -120,7 +93,7 @@ async function sendMessage(messages) {
     body: JSON.stringify(provider.buildBody(PROVIDER.model, fullMessages)),
   });
 
-  // Handle HTTP-level errors
+  
   if (!response.ok) {
     let errText = `HTTP ${response.status}`;
     try {
@@ -134,6 +107,4 @@ async function sendMessage(messages) {
   return provider.parseResponse(data);
 }
 
-// Exposed as a plain const — accessible to content.js which loads after this file.
-// (All three files share the same content-script scope per manifest load order.)
 const GuptXLLM = { sendMessage };

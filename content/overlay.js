@@ -1,25 +1,17 @@
-// content/overlay.js
-// GuptX overlay UI controller.
-// Runs as a CONTENT SCRIPT (extension world) — chrome.* APIs and GuptXLLM
-// are available directly. No page-world bridging required.
-//
-// Load order guaranteed by manifest.json:
-//   utils/storage.js  →  api/llm.js  →  overlay.js  →  content.js
-
 (async () => {
-  // ── Guard: prevent double-initialisation ─────────────────────────
+  
   if (window.__guptxOverlayReady) return;
   window.__guptxOverlayReady = true;
 
-  // ── Load HTML template via extension URL ─────────────────────────
+  
   const htmlUrl  = chrome.runtime.getURL("content/overlay.html");
   const htmlText = await fetch(htmlUrl).then((r) => r.text());
 
   const wrapper = document.createElement("div");
   wrapper.innerHTML = htmlText;
-  document.body.appendChild(wrapper.firstElementChild); // mounts #guptx-root
+  document.body.appendChild(wrapper.firstElementChild); 
 
-  // ── Element references ───────────────────────────────────────────
+  
   const root          = document.getElementById("guptx-root");
   const panel         = document.getElementById("guptx-panel");
   const header        = document.getElementById("guptx-header");
@@ -31,38 +23,38 @@
   const messagesEl    = document.getElementById("guptx-messages");
   const inputEl       = document.getElementById("guptx-input");
   const sendBtn       = document.getElementById("guptx-send-btn");
-  const clearBtn      = document.getElementById("guptx-clear-btn");
-  // Feature 1 — theme elements
+  const clearChatBtn  = document.getElementById("guptx-clear-chat-btn");
+  
   const themeBtn      = document.getElementById("guptx-theme-btn");
   const iconSun       = document.getElementById("guptx-icon-sun");
   const iconMoon      = document.getElementById("guptx-icon-moon");
 
-  // ── State ────────────────────────────────────────────────────────
+  
   let isVisible    = false;
   let isAnimating  = false;
   let settingsOpen = false;
-  let chatHistory  = []; // { role: "user"|"assistant", content: string }[]
+  let chatHistory  = []; 
 
-  // ── Feature 1: Dark / Light Theme ───────────────────────────────
-  // Theme class is toggled on <html> so CSS variables defined under
-  // .guptx-light take effect globally for the overlay.
+  
+  
+  
   const THEME_KEY   = "guptx_theme";
   const isLightPref = localStorage.getItem(THEME_KEY) === "light";
 
-  // Auto-detect system preference on first run (no saved pref yet)
+  
   const preferLight = localStorage.getItem(THEME_KEY) === null
     ? window.matchMedia("(prefers-color-scheme: light)").matches
     : isLightPref;
 
   function applyTheme(light) {
     document.documentElement.classList.toggle("guptx-light", light);
-    // Swap sun/moon icon to reflect current mode
+    
     iconSun.style.display  = light ? "none"  : "";
     iconMoon.style.display = light ? ""      : "none";
     localStorage.setItem(THEME_KEY, light ? "light" : "dark");
   }
 
-  // Apply on boot
+  
   applyTheme(preferLight);
 
   themeBtn.addEventListener("click", () => {
@@ -70,14 +62,14 @@
     applyTheme(isNowLight);
   });
 
-  // ── Opacity ──────────────────────────────────────────────────────
+  
   function applyOpacity(val) {
     panel.style.opacity      = val / 100;
     opacitySlider.value      = val;
     opacityValue.textContent = `${val}%`;
   }
 
-  // Load persisted opacity directly from chrome.storage via GuptXStorage
+  
   try {
     const stored = await GuptXStorage.get(["opacity"]);
     applyOpacity(stored.opacity ?? 90);
@@ -85,17 +77,17 @@
     applyOpacity(90);
   }
 
-  // Live preview while dragging the slider
+  
   opacitySlider.addEventListener("input", () => {
     applyOpacity(parseInt(opacitySlider.value, 10));
   });
 
-  // Persist on pointer release
+  
   opacitySlider.addEventListener("change", () => {
     GuptXStorage.set({ opacity: parseInt(opacitySlider.value, 10) }).catch(() => {});
   });
 
-  // ── Chat history ─────────────────────────────────────────────────
+  
   async function loadHistory() {
     try {
       const data = await GuptXStorage.get(["chatHistory"]);
@@ -104,7 +96,7 @@
   }
 
   function persistHistory() {
-    // Keep last 60 messages to stay within storage limits
+    
     GuptXStorage.set({ chatHistory: chatHistory.slice(-60) }).catch(() => {});
   }
 
@@ -115,7 +107,7 @@
     scrollToBottom();
   }
 
-  // ── Bubble rendering ─────────────────────────────────────────────
+  
   function appendBubble(type, text, save = true) {
     const div = document.createElement("div");
     div.className   = `guptx-msg guptx-msg-${type}`;
@@ -154,7 +146,7 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  // ── Visibility ───────────────────────────────────────────────────
+  
   function show() {
     if (isVisible || isAnimating) return;
     isVisible   = true;
@@ -185,56 +177,97 @@
     }, { once: true });
   }
 
-  // Exposed so content.js can call toggle without needing its own event system
+  
   window.__guptxToggle = () => (isVisible ? hide() : show());
 
-  // ── Settings drawer ───────────────────────────────────────────────
+  
   settingsBtn.addEventListener("click", () => {
     settingsOpen = !settingsOpen;
     settingsEl.classList.toggle("guptx-open", settingsOpen);
   });
 
-  clearBtn.addEventListener("click", () => {
+  
+  function clearConversation() {
     chatHistory = [];
     GuptXStorage.set({ chatHistory: [] }).catch(() => {});
     messagesEl.innerHTML = "";
     appendBubble("system", "Conversation cleared.", false);
-  });
+  }
+
+  clearChatBtn.addEventListener("click", clearConversation);
 
   closeBtn.addEventListener("click", hide);
 
-  // ── Keyboard shortcuts ────────────────────────────────────────────
+  
+  
+  function toggleInputFocus() {
+    if (document.activeElement === inputEl) {
+      inputEl.blur();
+    } else {
+      inputEl.focus();
+    }
+  }
+
   document.addEventListener("keydown", (e) => {
-    // Escape: hide overlay
+    
     if (e.key === "Escape" && isVisible) {
       hide();
       return;
     }
 
-    // Feature 2: Alt+ArrowUp / Alt+ArrowDown — opacity control
-    // Only fires when overlay is visible and focus is NOT in the textarea
-    if (e.altKey && isVisible && document.activeElement !== inputEl) {
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-        e.preventDefault(); // block browser scroll / zoom shortcuts
+    
+    
+    
+    if (e.altKey && isVisible) {
+      
+      if (e.key === "i" || e.key === "I") {
+        e.preventDefault();
+        toggleInputFocus();
+        return;
+      }
+
+      
+      
+      
+      
+      
+      if (document.activeElement === inputEl) return;
+
+      
+      if (e.key === "]" || e.key === "[") {
+        e.preventDefault();
 
         const step    = 5;
         const current = parseInt(opacitySlider.value, 10);
-        const next    = e.key === "ArrowUp"
+        const next    = e.key === "]"
           ? Math.min(100, current + step)
-          : Math.max(30,  current - step);
+          : Math.max(20,  current - step);
 
-        if (next === current) return; // already at limit, nothing to do
+        if (next === current) return;
 
-        // Update panel opacity, slider position, and label in one call
         applyOpacity(next);
-
-        // Persist the new value via existing storage logic
         GuptXStorage.set({ opacity: next }).catch(() => {});
+        return;
+      }
+
+      
+      if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        const isNowLight = !document.documentElement.classList.contains("guptx-light");
+        applyTheme(isNowLight);
+        return;
+      }
+
+      
+      if (e.key === "c" || e.key === "C") {
+        e.preventDefault();
+        clearConversation();
+        return;
       }
     }
   }, true);
 
-  // ── Dragging ──────────────────────────────────────────────────────
+  
   let dragging = false;
   let dragOffX = 0;
   let dragOffY = 0;
@@ -245,7 +278,7 @@
     dragging = true;
 
     const rect = root.getBoundingClientRect();
-    // Swap right/bottom origin to left/top so dragging math is straightforward
+    
     root.style.right  = "auto";
     root.style.bottom = "auto";
     root.style.left   = `${rect.left}px`;
@@ -263,13 +296,13 @@
 
   document.addEventListener("mouseup", () => { dragging = false; });
 
-  // ── Auto-resize textarea ──────────────────────────────────────────
+  
   inputEl.addEventListener("input", () => {
     inputEl.style.height = "auto";
     inputEl.style.height = `${Math.min(inputEl.scrollHeight, 120)}px`;
   });
 
-  // ── Send message ──────────────────────────────────────────────────
+  
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text || sendBtn.disabled) return;
@@ -280,12 +313,12 @@
 
     appendBubble("user", text);
 
-    // Snapshot the full history (including the message just appended above)
+    
     const historySnapshot = [...chatHistory];
     appendTypingIndicator();
 
     try {
-      // Direct call to GuptXLLM — no relay, no events, no postMessage.
+      
       const reply = await GuptXLLM.sendMessage(historySnapshot);
       removeTypingIndicator();
       appendBubble("ai", reply);
@@ -307,7 +340,7 @@
     }
   });
 
-  // ── Boot ──────────────────────────────────────────────────────────
+  
   chatHistory = await loadHistory();
   renderHistory(chatHistory);
 
