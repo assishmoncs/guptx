@@ -1,23 +1,58 @@
 # GuptX
 
-**GuptX** is a stealth AI assistant Chrome extension that works as a hidden layer over the web.
+**GuptX** is a stealth AI assistant Chrome extension that works as a hidden intelligent layer over the web.
 It provides instant AI assistance through a floating overlay without interrupting your browsing workflow.
 
 Press **Alt + X** anytime to summon your private AI assistant.
 
 ---
 
+## 🚀 Version 2.0.0
+
+GuptX v2 introduces major usability and workflow improvements focused on speed, control, and accessibility.
+
+### New in v2.0.0
+
+* 🎨 Dark / Light theme toggle (keyboard shortcut)
+* 👻 Opacity control shortcuts
+* 🔧 Minimum opacity reduced to **20%**
+* 🧹 Clear conversation option (button + shortcut)
+* ⌨️ Improved keyboard interaction while typing
+* ⚡ Better focus handling and smoother UX
+
+---
+
 ## ✨ Features
 
-* ⚡ Keyboard-triggered AI overlay (Alt + X)
-* 🎨 Dark & Light mode support
-* 👻 Adjustable transparency (slider + shortcuts)
-* ⌨️ Alt + ↑ / Alt + ↓ opacity control
-* 💬 Persistent chat history
+* ⚡ Keyboard-triggered AI overlay
 * 🧠 Powered by Groq LLM API
+* 🎨 Dark & Light themes
+* 👻 Adjustable transparency (20%–100%)
+* 💬 Persistent chat history
+* 🧹 Clear conversation anytime
 * 🪟 Draggable floating panel
 * 🔒 Local preference storage
 * 🌐 Works on any website
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut    | Action                    |
+| ----------- | ------------------------- |
+| **Alt + X** | Toggle GuptX              |
+| **Alt + T** | Toggle Dark / Light theme |
+| **Alt + ]** | Increase opacity          |
+| **Alt + [** | Decrease opacity          |
+| **Alt + C** | Clear conversation        |
+| **Alt + I** | Focus / unfocus input box |
+| **Esc**     | Hide overlay              |
+
+Shortcuts can be customized at:
+
+```
+chrome://extensions/shortcuts
+```
 
 ---
 
@@ -30,34 +65,25 @@ Press **Alt + X** anytime to summon your private AI assistant.
 
 ---
 
-## 🚀 Installation (Developer Mode)
+## 📦 Installation (Developer Mode)
 
-1. Clone or download this repository.
+1. Download the latest ZIP from **Releases**.
 
-2. Open Chrome and go to:
+2. Extract the archive.
 
+3. Open Chrome and navigate to:
+
+   ```
    chrome://extensions
+   ```
 
-3. Enable **Developer Mode** (top-right).
+4. Enable **Developer Mode** (top-right).
 
-4. Click **Load unpacked**.
+5. Click **Load unpacked**.
 
-5. Select the project folder.
+6. Select the extracted folder.
 
-GuptX will now appear in your extensions list.
-
----
-
-## ⌨️ Shortcuts
-
-| Shortcut | Action           |
-| -------- | ---------------- |
-| Alt + X  | Toggle GuptX     |
-| Esc      | Hide overlay     |
-| Alt + ↑  | Increase opacity |
-| Alt + ↓  | Decrease opacity |
-
-(Shortcuts can be customized at `chrome://extensions/shortcuts`.)
+GuptX will now be available in your browser.
 
 ---
 
@@ -66,18 +92,38 @@ GuptX will now appear in your extensions list.
 1. Create a free API key at:
    https://console.groq.com
 
-2. Add your key inside the extension settings or configuration file.
+2. Add your API key inside the extension when prompted.
 
-GuptX uses Groq's fast LLM inference for responsive conversations.
+⚠️ API keys are stored locally and are never included in this repository.
 
 ---
 
-## 🎯 Project Goal
+## 📁 Project Structure
 
-GuptX explores the idea of an **AI layer integrated directly into browsing**, providing fast assistance without opening new tabs or interrupting workflow.
+```
+guptx/
+├── manifest.json
+├── background/
+├── content/
+├── api/
+├── utils/
+└── assets/
+```
+
+---
+
+## 🎯 Project Vision
+
+GuptX explores the concept of an **AI layer integrated directly into browsing**, enabling fast interaction with AI without opening new tabs or disrupting workflow.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project is intended for learning and productivity purposes only.
+GuptX is intended for learning, productivity, and experimentation purposes.
+
+---
+
+## 📜 License
+
+MIT License © 2026 ASSISHMON C S
