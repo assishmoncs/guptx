@@ -241,7 +241,7 @@
         const current = parseInt(opacitySlider.value, 10);
         const next    = e.key === "]"
           ? Math.min(100, current + step)
-          : Math.max(20,  current - step);
+          : Math.max(0,  current - step);
 
         if (next === current) return;
 
