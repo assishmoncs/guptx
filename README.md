@@ -15,7 +15,7 @@ GuptX v2 introduces major usability and workflow improvements focused on speed, 
 
 * 🎨 Dark / Light theme toggle (keyboard shortcut)
 * 👻 Opacity control shortcuts
-* 🔧 Minimum opacity reduced to **20%**
+* 🔧 Minimum opacity reduced to **0%**
 * 🧹 Clear conversation option (button + shortcut)
 * ⌨️ Improved keyboard interaction while typing
 * ⚡ Better focus handling and smoother UX
@@ -27,7 +27,7 @@ GuptX v2 introduces major usability and workflow improvements focused on speed, 
 * ⚡ Keyboard-triggered AI overlay
 * 🧠 Powered by Groq LLM API
 * 🎨 Dark & Light themes
-* 👻 Adjustable transparency (20%–100%)
+* 👻 Adjustable transparency (0%–100%)
 * 💬 Persistent chat history
 * 🧹 Clear conversation anytime
 * 🪟 Draggable floating panel
