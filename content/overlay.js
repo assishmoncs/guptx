@@ -44,16 +44,18 @@
     const sendBtn = root.querySelector("#guptx-send-btn");
     const clearChatBtn = root.querySelector("#guptx-clear-chat-btn");
     const themeBtn = root.querySelector("#guptx-theme-btn");
+    const resizeHandle = root.querySelector("#guptx-resize-handle");
     const iconSun = root.querySelector("#guptx-icon-sun");
     const iconMoon = root.querySelector("#guptx-icon-moon");
 
-    if (!panel || !header || !closeBtn || !settingsBtn || !settingsEl || !opacitySlider || !opacityValue || !messagesEl || !inputEl || !sendBtn || !clearChatBtn || !themeBtn || !iconSun || !iconMoon) {
+    if (!panel || !header || !closeBtn || !settingsBtn || !settingsEl || !opacitySlider || !opacityValue || !messagesEl || !inputEl || !sendBtn || !clearChatBtn || !themeBtn || !resizeHandle || !iconSun || !iconMoon) {
       return;
     }
 
     let isVisible = false;
     let isAnimating = false;
     let settingsOpen = false;
+    let headerHidden = false;
     let chatHistory = [];
 
     const THEME_KEY = "guptx_theme";
@@ -188,6 +190,11 @@
       if (isVisible) hide(); else show();
     }
 
+    function setHeaderHidden(hidden) {
+      headerHidden = hidden;
+      header.style.display = hidden ? "none" : "";
+    }
+
     chrome.runtime.onMessage.addListener((msg) => {
       if (msg?.type === "GUPTX_TOGGLE") {
         toggleOverlay();
@@ -230,6 +237,12 @@
           return;
         }
 
+        if (e.key === "u" || e.key === "U") {
+          e.preventDefault();
+          setHeaderHidden(!headerHidden);
+          return;
+        }
+
         if (inputEl.matches(":focus")) return;
 
         if (e.key === "]" || e.key === "[") {
@@ -265,6 +278,14 @@
     let dragging = false;
     let dragOffX = 0;
     let dragOffY = 0;
+    let resizing = false;
+    let resizeStartX = 0;
+    let resizeStartY = 0;
+    let resizeStartW = 0;
+    let resizeStartH = 0;
+
+    const MIN_PANEL_WIDTH = 320;
+    const MIN_PANEL_HEIGHT = 360;
 
     header.addEventListener("mousedown", (e) => {
       if (e.button !== 0) return;
@@ -288,6 +309,36 @@
     });
 
     document.addEventListener("mouseup", () => { dragging = false; });
+
+    resizeHandle.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rect = panel.getBoundingClientRect();
+      panel.style.width = `${rect.width}px`;
+      panel.style.height = `${rect.height}px`;
+
+      resizing = true;
+      resizeStartX = e.clientX;
+      resizeStartY = e.clientY;
+      resizeStartW = rect.width;
+      resizeStartH = rect.height;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!resizing) return;
+
+      const maxW = Math.max(MIN_PANEL_WIDTH, window.innerWidth - 16);
+      const maxH = Math.max(MIN_PANEL_HEIGHT, window.innerHeight - 16);
+      const nextW = Math.max(MIN_PANEL_WIDTH, Math.min(maxW, resizeStartW + (e.clientX - resizeStartX)));
+      const nextH = Math.max(MIN_PANEL_HEIGHT, Math.min(maxH, resizeStartH + (e.clientY - resizeStartY)));
+
+      panel.style.width = `${nextW}px`;
+      panel.style.height = `${nextH}px`;
+    });
+
+    document.addEventListener("mouseup", () => { resizing = false; });
 
     inputEl.addEventListener("input", () => {
       inputEl.style.height = "auto";
@@ -333,7 +384,7 @@
     renderHistory(chatHistory);
 
     if (chatHistory.length === 0) {
-      appendBubble("system", "GuptX ready · Alt+X to toggle · Esc to hide", false);
+      appendBubble("system", "GuptX ready · Alt+X to toggle · Alt+U to hide/show header · Esc to hide", false);
     }
   })().catch(() => {});
 })();

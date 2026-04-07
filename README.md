@@ -7,18 +7,17 @@ Press **Alt + X** anytime to summon your private AI assistant.
 
 ---
 
-## 🚀 Version 2.0.0
+## 🚀 Version 3.0
 
-GuptX v2 introduces major usability and workflow improvements focused on speed, control, and accessibility.
+GuptX v3 introduces more control over panel layout and faster in-overlay navigation.
 
-### New in v2.0.0
+### New in v3.0
 
 * 🎨 Dark / Light theme toggle (keyboard shortcut)
 * 👻 Opacity control shortcuts
-* 🔧 Minimum opacity reduced to **0%**
+* 🪟 Mouse-based panel resize (width + height)
+* 🧭 Header hide/show shortcut (**Alt + U**)
 * 🧹 Clear conversation option (button + shortcut)
-* ⌨️ Improved keyboard interaction while typing
-* ⚡ Better focus handling and smoother UX
 
 ---
 
@@ -44,6 +43,7 @@ GuptX v2 introduces major usability and workflow improvements focused on speed, 
 | **Alt + T** | Toggle Dark / Light theme |
 | **Alt + ]** | Increase opacity          |
 | **Alt + [** | Decrease opacity          |
+| **Alt + U** | Hide / show header        |
 | **Alt + C** | Clear conversation        |
 | **Alt + I** | Focus / unfocus input box |
 | **Esc**     | Hide overlay              |
