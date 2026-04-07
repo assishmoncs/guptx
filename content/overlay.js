@@ -1,5 +1,5 @@
 (() => {
-  if (document.querySelector("guptx-shadow-host")) return;
+  if (document.querySelector("div[data-guptx-shadow-host]")) return;
 
   (async () => {
     const htmlUrl = chrome.runtime.getURL("content/overlay.html");
@@ -9,7 +9,8 @@
       fetch(cssUrl).then((r) => r.text()),
     ]);
 
-    const host = document.createElement("guptx-shadow-host");
+    const host = document.createElement("div");
+    host.setAttribute("data-guptx-shadow-host", "1");
     host.style.cssText = [
       "all: initial !important",
       "position: fixed !important",
@@ -78,7 +79,7 @@
 
     function applyOpacity(val) {
       panel.style.opacity = val / 100;
-      opacitySlider.value = String(val);
+      opacitySlider.value = val;
       opacityValue.textContent = `${val}%`;
     }
 
@@ -209,7 +210,7 @@
     closeBtn.addEventListener("click", hide);
 
     function toggleInputFocus() {
-      if (document.activeElement === inputEl) {
+      if (inputEl.matches(":focus")) {
         inputEl.blur();
       } else {
         inputEl.focus();
@@ -229,7 +230,7 @@
           return;
         }
 
-        if (document.activeElement === inputEl) return;
+        if (inputEl.matches(":focus")) return;
 
         if (e.key === "]" || e.key === "[") {
           e.preventDefault();
