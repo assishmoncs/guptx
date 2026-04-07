@@ -434,7 +434,7 @@
   right: 0;
   width: 16px;
   height: 16px;
-  cursor: nwse-resize;
+  cursor: se-resize;
   opacity: 0.55;
   border-right: 2px solid var(--gx-text-dim);
   border-bottom: 2px solid var(--gx-text-dim);
