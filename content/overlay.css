@@ -100,6 +100,11 @@
 #guptx-panel {
   width: 380px;
   height: 520px;
+  min-width: 320px;
+  min-height: 360px;
+  max-width: min(96vw, 980px);
+  max-height: min(96vh, 980px);
+  position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 16px;
@@ -426,9 +431,22 @@
 #guptx-resize-handle {
   position: absolute;
   bottom: 0;
-  left: 0;
+  right: 0;
   width: 16px;
   height: 16px;
-  cursor: sw-resize;
-  opacity: 0;
+  cursor: nwse-resize;
+  opacity: 0.55;
+  border-right: 2px solid var(--gx-text-dim);
+  border-bottom: 2px solid var(--gx-text-dim);
+  border-bottom-right-radius: 6px;
+  box-sizing: border-box;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+#guptx-panel:hover #guptx-resize-handle {
+  opacity: 0.95;
+}
+
+#guptx-resize-handle:hover {
+  border-color: var(--gx-text);
 }
