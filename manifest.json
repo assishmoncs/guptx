@@ -27,7 +27,6 @@
         "content/overlay.js",
         "content/content.js"
       ],
-      "css": ["content/overlay.css"],
       "run_at": "document_end",
       "all_frames": false
     }
@@ -45,10 +44,11 @@
 
   "web_accessible_resources": [
     {
-      "resources": [
-        "content/overlay.html",
-        "assets/icon.png"
-      ],
+        "resources": [
+          "content/overlay.html",
+          "content/overlay.css",
+          "assets/icon.png"
+        ],
       "matches": ["<all_urls>"]
     }
   ],
