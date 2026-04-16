@@ -46,7 +46,7 @@ async function toggleOverlayInTab(tabId) {
     return;
   }
 
-  for (let i = 0; i < MAX_TOGGLE_RETRIES; i += 1) {
+  for (let retryAttempt = 0; retryAttempt < MAX_TOGGLE_RETRIES; retryAttempt += 1) {
     try {
       await sendToggle(tabId);
       return;
@@ -65,4 +65,8 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 chrome.action.onClicked.addListener(async (tab) => {
   await toggleOverlayInTab(tab?.id);
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  tabLastToggleAt.delete(tabId);
 });
