@@ -7,7 +7,7 @@ const GUPTX_INJECT_FILES = [
 
 const TOGGLE_DEBOUNCE_MS = 250;
 const MAX_TOGGLE_RETRIES = 6;
-const TOGGLE_RETRY_DELAY_MS = 60;
+const TOGGLE_RETRY_DELAY_MS = 100;
 const tabLastToggleAt = new Map();
 
 function delay(ms) {
