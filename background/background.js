@@ -6,6 +6,8 @@ const GUPTX_INJECT_FILES = [
 ];
 
 const TOGGLE_DEBOUNCE_MS = 250;
+const MAX_TOGGLE_RETRIES = 6;
+const TOGGLE_RETRY_DELAY_MS = 60;
 const tabLastToggleAt = new Map();
 
 function delay(ms) {
@@ -44,12 +46,12 @@ async function toggleOverlayInTab(tabId) {
     return;
   }
 
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < MAX_TOGGLE_RETRIES; i += 1) {
     try {
       await sendToggle(tabId);
       return;
     } catch (_) {
-      await delay(60);
+      await delay(TOGGLE_RETRY_DELAY_MS);
     }
   }
 }
