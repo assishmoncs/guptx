@@ -1,56 +1,57 @@
 (() => {
   if (document.querySelector("div[data-guptx-shadow-host]")) return;
 
+  const host = document.createElement("div");
+  host.setAttribute("data-guptx-shadow-host", "1");
+  host.style.cssText = [
+    "all: initial !important",
+    "position: fixed !important",
+    "inset: 0 !important",
+    "z-index: 2147483647 !important",
+    "pointer-events: none !important",
+  ].join(";");
+  document.documentElement.appendChild(host);
+
   (async () => {
-    const htmlUrl = chrome.runtime.getURL("content/overlay.html");
-    const cssUrl = chrome.runtime.getURL("content/overlay.css");
-    const [htmlText, cssText] = await Promise.all([
-      fetch(htmlUrl).then((r) => r.text()),
-      fetch(cssUrl).then((r) => r.text()),
-    ]);
+    let setupSucceeded = false;
+    try {
+      const htmlUrl = chrome.runtime.getURL("content/overlay.html");
+      const cssUrl = chrome.runtime.getURL("content/overlay.css");
+      const [htmlText, cssText] = await Promise.all([
+        fetch(htmlUrl).then((r) => r.text()),
+        fetch(cssUrl).then((r) => r.text()),
+      ]);
 
-    const host = document.createElement("div");
-    host.setAttribute("data-guptx-shadow-host", "1");
-    host.style.cssText = [
-      "all: initial !important",
-      "position: fixed !important",
-      "inset: 0 !important",
-      "z-index: 2147483647 !important",
-      "pointer-events: none !important",
-    ].join(";");
-    document.documentElement.appendChild(host);
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = htmlText;
+      const mountRoot = wrapper.firstElementChild;
+      if (!mountRoot) return;
 
-    const shadowRoot = host.attachShadow({ mode: "closed" });
-    const styleEl = document.createElement("style");
-    styleEl.textContent = cssText;
+      const shadowRoot = host.attachShadow({ mode: "closed" });
+      const styleEl = document.createElement("style");
+      styleEl.textContent = cssText;
+      shadowRoot.append(styleEl, mountRoot);
 
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = htmlText;
-    const mountRoot = wrapper.firstElementChild;
-    if (!mountRoot) return;
+      const root = mountRoot;
+      const panel = root.querySelector("#guptx-panel");
+      const header = root.querySelector("#guptx-header");
+      const closeBtn = root.querySelector("#guptx-close-btn");
+      const settingsBtn = root.querySelector("#guptx-settings-btn");
+      const settingsEl = root.querySelector("#guptx-settings");
+      const opacitySlider = root.querySelector("#guptx-opacity-slider");
+      const opacityValue = root.querySelector("#guptx-opacity-value");
+      const messagesEl = root.querySelector("#guptx-messages");
+      const inputEl = root.querySelector("#guptx-input");
+      const sendBtn = root.querySelector("#guptx-send-btn");
+      const clearChatBtn = root.querySelector("#guptx-clear-chat-btn");
+      const themeBtn = root.querySelector("#guptx-theme-btn");
+      const resizeHandle = root.querySelector("#guptx-resize-handle");
+      const iconSun = root.querySelector("#guptx-icon-sun");
+      const iconMoon = root.querySelector("#guptx-icon-moon");
 
-    shadowRoot.append(styleEl, mountRoot);
-
-    const root = mountRoot;
-    const panel = root.querySelector("#guptx-panel");
-    const header = root.querySelector("#guptx-header");
-    const closeBtn = root.querySelector("#guptx-close-btn");
-    const settingsBtn = root.querySelector("#guptx-settings-btn");
-    const settingsEl = root.querySelector("#guptx-settings");
-    const opacitySlider = root.querySelector("#guptx-opacity-slider");
-    const opacityValue = root.querySelector("#guptx-opacity-value");
-    const messagesEl = root.querySelector("#guptx-messages");
-    const inputEl = root.querySelector("#guptx-input");
-    const sendBtn = root.querySelector("#guptx-send-btn");
-    const clearChatBtn = root.querySelector("#guptx-clear-chat-btn");
-    const themeBtn = root.querySelector("#guptx-theme-btn");
-    const resizeHandle = root.querySelector("#guptx-resize-handle");
-    const iconSun = root.querySelector("#guptx-icon-sun");
-    const iconMoon = root.querySelector("#guptx-icon-moon");
-
-    if (!panel || !header || !closeBtn || !settingsBtn || !settingsEl || !opacitySlider || !opacityValue || !messagesEl || !inputEl || !sendBtn || !clearChatBtn || !themeBtn || !resizeHandle || !iconSun || !iconMoon) {
-      return;
-    }
+      if (!panel || !header || !closeBtn || !settingsBtn || !settingsEl || !opacitySlider || !opacityValue || !messagesEl || !inputEl || !sendBtn || !clearChatBtn || !themeBtn || !resizeHandle || !iconSun || !iconMoon) {
+        return;
+      }
 
     let isVisible = false;
     let isAnimating = false;
@@ -386,5 +387,11 @@
     if (chatHistory.length === 0) {
       appendBubble("system", "GuptX ready · Alt+X to toggle · Alt+U to hide/show header · Esc to hide", false);
     }
+    setupSucceeded = true;
+  } finally {
+    if (!setupSucceeded && host.isConnected) {
+      host.remove();
+    }
+  }
   })().catch(() => {});
 })();
