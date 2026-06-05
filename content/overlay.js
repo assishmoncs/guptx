@@ -1,15 +1,19 @@
 (() => {
-  const overlayStateKey = "__guptxOverlayState";
-  const overlayState = globalThis[overlayStateKey] || (globalThis[overlayStateKey] = {
-    bootstrapping: false,
-    initialized: false,
-  });
+  if (document.querySelector("div[data-guptx-shadow-host]")) return;
 
-  if (document.querySelector("div[data-guptx-shadow-host]") || overlayState.initialized || overlayState.bootstrapping) return;
-  overlayState.bootstrapping = true;
+  const host = document.createElement("div");
+  host.setAttribute("data-guptx-shadow-host", "1");
+  host.style.cssText = [
+    "all: initial !important",
+    "position: fixed !important",
+    "inset: 0 !important",
+    "z-index: 2147483647 !important",
+    "pointer-events: none !important",
+  ].join(";");
+  document.documentElement.appendChild(host);
 
   (async () => {
-    let host = null;
+    let setupSucceeded = false;
     try {
       const htmlUrl = chrome.runtime.getURL("content/overlay.html");
       const cssUrl = chrome.runtime.getURL("content/overlay.css");
@@ -22,17 +26,6 @@
       wrapper.innerHTML = htmlText;
       const mountRoot = wrapper.firstElementChild;
       if (!mountRoot) return;
-
-      host = document.createElement("div");
-      host.setAttribute("data-guptx-shadow-host", "1");
-      host.style.cssText = [
-        "all: initial !important",
-        "position: fixed !important",
-        "inset: 0 !important",
-        "z-index: 2147483647 !important",
-        "pointer-events: none !important",
-      ].join(";");
-      document.documentElement.appendChild(host);
 
       const shadowRoot = host.attachShadow({ mode: "closed" });
       const styleEl = document.createElement("style");
@@ -59,8 +52,6 @@
       if (!panel || !header || !closeBtn || !settingsBtn || !settingsEl || !opacitySlider || !opacityValue || !messagesEl || !inputEl || !sendBtn || !clearChatBtn || !themeBtn || !resizeHandle || !iconSun || !iconMoon) {
         return;
       }
-
-      overlayState.initialized = true;
 
     let isVisible = false;
     let isAnimating = false;
@@ -396,11 +387,11 @@
     if (chatHistory.length === 0) {
       appendBubble("system", "GuptX ready · Alt+X to toggle · Alt+U to hide/show header · Esc to hide", false);
     }
+    setupSucceeded = true;
   } finally {
-    if (!overlayState.initialized && host?.isConnected) {
+    if (!setupSucceeded && host.isConnected) {
       host.remove();
     }
-    overlayState.bootstrapping = false;
   }
   })().catch(() => {});
 })();
